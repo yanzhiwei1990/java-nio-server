@@ -17,6 +17,7 @@ public class Message {
     public int    length      = 0; //the number of bytes used of the allocated section.
 
     public Object metaData    = null;
+    public String connectInfo = null;
 
     public Message(MessageBuffer messageBuffer) {
         this.messageBuffer = messageBuffer;

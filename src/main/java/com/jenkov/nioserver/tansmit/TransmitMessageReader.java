@@ -1,4 +1,4 @@
-package com.jenkov.nioserver.http;
+package com.jenkov.nioserver.tansmit;
 
 import com.jenkov.nioserver.IMessageReader;
 import com.jenkov.nioserver.Message;
@@ -13,25 +13,26 @@ import java.util.List;
 /**
  * Created by jjenkov on 18-10-2015.
  */
-public class HttpMessageReader implements IMessageReader {
+public class TransmitMessageReader implements IMessageReader {
 
     private MessageBuffer messageBuffer    = null;
 
     private List<Message> completeMessages = new ArrayList<Message>();
     private Message       nextMessage      = null;
 
-    public HttpMessageReader() {
+    public TransmitMessageReader() {
     }
 
     @Override
     public void init(MessageBuffer readMessageBuffer) {
         this.messageBuffer        = readMessageBuffer;
         this.nextMessage          = messageBuffer.getMessage();
-        this.nextMessage.metaData = new HttpHeaders();
+        this.nextMessage.metaData = new TransmitHeaders();
     }
 
     @Override
     public void read(Socket socket, ByteBuffer byteBuffer) throws IOException {
+    	System.out.println("TransmitMessageReader read positon = " + byteBuffer.position() + ", remain = " + byteBuffer.remaining());
         int bytesRead = socket.read(byteBuffer);
         byteBuffer.flip();
 
@@ -42,12 +43,12 @@ public class HttpMessageReader implements IMessageReader {
 
         this.nextMessage.writeToMessage(byteBuffer);
 
-        int endIndex = HttpUtil.parseHttpRequest(this.nextMessage.sharedArray, this.nextMessage.offset, this.nextMessage.offset + this.nextMessage.length, (HttpHeaders) this.nextMessage.metaData);
+        int endIndex = TansmitUtil.parseTransmitRequest(this.nextMessage.sharedArray, this.nextMessage.offset, this.nextMessage.offset + this.nextMessage.length, (TransmitHeaders) this.nextMessage.metaData);
         if(endIndex != -1){
             Message message = this.messageBuffer.getMessage();
-            message.metaData = new HttpHeaders();
+            message.metaData = new TransmitHeaders();
             message.connectInfo = socket.socketChannel.toString();
-
+            
             message.writePartialMessageToMessage(nextMessage, endIndex);
 
             completeMessages.add(nextMessage);

@@ -51,18 +51,12 @@ public class SocketProcessor implements Runnable {
         this.readSelector         = Selector.open();
         this.writeSelector        = Selector.open();
     }
-
+    
     public void run() {
         while(true){
             try{
                 executeCycle();
             } catch(IOException e){
-                e.printStackTrace();
-            }
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -124,6 +118,7 @@ public class SocketProcessor implements Runnable {
         if(fullMessages.size() > 0){
             for(Message message : fullMessages){
                 message.socketId = socket.socketId;
+                message.connectInfo = socket.socketChannel.toString();
                 this.messageProcessor.process(message, this.writeProxy);  //the message processor will eventually push outgoing messages into an IMessageWriter for this socket.
             }
             fullMessages.clear();

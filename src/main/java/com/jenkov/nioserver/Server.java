@@ -14,13 +14,15 @@ public class Server {
     private SocketProcessor socketProcessor = null;
 
     private int tcpPort = 0;
+    private String serverType = null;
     private IMessageReaderFactory messageReaderFactory = null;
     private IMessageProcessor     messageProcessor = null;
 
-    public Server(int tcpPort, IMessageReaderFactory messageReaderFactory, IMessageProcessor messageProcessor) {
+    public Server(String type, int tcpPort, IMessageReaderFactory messageReaderFactory, IMessageProcessor messageProcessor) {
         this.tcpPort = tcpPort;
         this.messageReaderFactory = messageReaderFactory;
         this.messageProcessor = messageProcessor;
+        this.serverType = type;
     }
 
     public void start() throws IOException {
@@ -40,6 +42,7 @@ public class Server {
 
         accepterThread.start();
         processorThread.start();
+        System.out.println("start " + serverType + " server!");
     }
 
 
